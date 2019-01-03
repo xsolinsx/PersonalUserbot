@@ -140,9 +140,7 @@ def DFromUToTelegramProgress(client: pyrogram.Client,
                                                            elapsed_time if elapsed_time != '' else "0 s",
                                                            estimated_total_time if estimated_total_time != '' else "0 s")
 
-        client.edit_message_text(message_id=msg.message_id,
-                                 chat_id=chat_id,
-                                 text=text + tmp)
+        msg.edit(text=text + tmp)
 
 
 @app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="mehelp", prefix=["/", "!", "#", "."]))
@@ -177,8 +175,8 @@ def CmdTodo(client: pyrogram.Client,
     if len(msg.command) > 0:
         # reconstruct the path in case there are spaces (pyrogram.Filters.command uses spaces as default separator)
         message += " ".join(msg.command)
-        client.send_message(chat_id="me",
-                            text="#TODO " + message)
+        app.send_message(chat_id="me",
+                         text="#TODO " + message)
 
 
 @app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="mevardump", prefix=["/", "!", "#", "."]))
@@ -192,7 +190,8 @@ def CmdVardump(client: pyrogram.Client,
     obj: pyrogram.Message = None
     try:
         if msg.reply_to_message:
-            obj = client.get_messages(chat_id=msg.chat.id, message_ids=msg.reply_to_message.message_id)
+            obj = app.get_messages(chat_id=msg.chat.id,
+                                   message_ids=msg.reply_to_message.message_id)
         else:
             obj = msg
         if hasattr(obj.from_user, "phone_number"):
@@ -210,8 +209,8 @@ def CmdVardump(client: pyrogram.Client,
         file_name = "message_too_long_{0}.txt".format(str(time.time()))
         with open(file_name, "w") as f:
             f.write(str(obj))
-        client.send_document(chat_id=msg.chat.id,
-                             document=file_name)
+        app.send_document(chat_id=msg.chat.id,
+                          document=file_name)
         os.remove(file_name)
     else:
         msg.reply(text="VARDUMP\n" + str(obj))
@@ -219,7 +218,7 @@ def CmdVardump(client: pyrogram.Client,
 
 @app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="merawinfo", prefix=["/", "!", "#", "."]))
 def CmdRawInfo(client: pyrogram.Client,
-            msg: pyrogram.Message):
+               msg: pyrogram.Message):
     print(print_string.format(datetime.datetime.now().time(),
                               msg.chat.first_name,
                               msg.chat.username,
@@ -228,11 +227,11 @@ def CmdRawInfo(client: pyrogram.Client,
     obj: pyrogram.User = None
     try:
         if len(msg.command) > 1:
-            obj = client.get_chat(chat_id=msg.command[1])
+            obj = app.get_chat(chat_id=msg.command[1])
         elif msg.reply_to_message:
-            obj = client.get_chat(chat_id=msg.reply_to_message.user.id)
+            obj = app.get_chat(chat_id=msg.reply_to_message.user.id)
         else:
-            obj = client.get_chat(chat_id=msg.chat.id)
+            obj = app.get_chat(chat_id=msg.chat.id)
         if hasattr(obj, "phone_number"):
             obj.phone_number = "CENSORED"
     except Exception as e:
@@ -248,22 +247,27 @@ def CmdInfo(client: pyrogram.Client,
                               msg.chat.username,
                               msg.chat.id,
                               msg.text))
+    # TODO ADD GROUPDATA FOR USERS
     obj: pyrogram.User = None
-    text = ""
+    text = "INFO\nID: {0}\nType: {1}\nUsername: {2}\nName: {3}\nSurname: {4}\nDescription: {5}\nDate: {6}"
     try:
         if len(msg.command) > 1:
-            obj = client.get_chat(chat_id=msg.command[1])
+            obj = app.get_chat(chat_id=msg.command[1])
         elif msg.reply_to_message:
-            obj = client.get_chat(chat_id=msg.reply_to_message.user.id)
+            obj = app.get_chat(chat_id=msg.reply_to_message.user.id)
         else:
-            obj = client.get_chat(chat_id=msg.chat.id)
-        if hasattr(obj, "phone_number"):
-            obj.phone_number = "CENSORED"
-        if obj.id
+            obj = app.get_chat(chat_id=msg.chat.id)
+
+        type_ = obj.type
+        text = text.format(obj.id,
+                           obj.type,
+                           obj.username,
+                           obj.first_name,
+                           obj.description,
+                           datetime.datetime.now().time())
     except Exception as e:
-        text = str(e)
-    if 
-    msg.reply(text="INFO\nID: {0}\nType: {1}\nUsername: {2}\nName: {3}\nSurname: {4}\nDescription: {5}" + str(obj))
+        text = "INFO\n" + str(e)
+    msg.reply(text=text)
 
 
 app.start()
