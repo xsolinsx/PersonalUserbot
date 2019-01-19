@@ -15,7 +15,7 @@ logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s
 print_string = "######################\n[{0}] {1}, @{2} ({3}): {4}"
 
 # check telegram api key
-app = pyrogram.Client(session_name="Pyrogram 0.9.3",
+app = pyrogram.Client(session_name="Pyrogram",
                       workers=2)
 
 
