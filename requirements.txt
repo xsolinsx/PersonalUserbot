@@ -1,1 +1,1 @@
-pyrogram[fast]==0.10.3
+pyrogram[fast]==0.15.1
