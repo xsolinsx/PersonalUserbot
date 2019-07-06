@@ -107,7 +107,7 @@ def DFromUToTelegramProgress(client: pyrogram.Client,
 
     text (``str``): Text to put into the update.
 
-    start (``str``): Time when the operation started.
+    start (``float``): Time when the operation started.
 
 
     Returns ``None``.

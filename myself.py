@@ -5,6 +5,7 @@ import math
 import os
 import pprint
 import re
+import sys
 import time
 
 import pyrogram
@@ -14,26 +15,21 @@ import utils
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
                     level=logging.ERROR)
 
-print_string = "######################\n[{0}] {1}, @{2} ({3}): {4}"
 info_string = "INFO\nID: {0}\nType: {1}\nUsername: {2}\nName: {3}\nSurname: {4}\nDescription: {5}\nDate: {6}"
 
 # check telegram api key
 app = pyrogram.Client(session_name="Pyrogram",
                       workers=2)
-RUNNING = "**Eval Expression:**\n```{}```\n**Running...**"
-ERROR = "**Eval Expression:**\n```{}```\n**Error:**\n```{}```"
-SUCCESS = "**Eval Expression:**\n```{}```\n**Success**"
-RESULT = "**Eval Expression:**\n```{}```\n**Result:**\n```{}```"
 
 
-@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="meexec", prefix=["/", "!", "#", "."]))
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("meexec", prefix=["/", "!", "#", "."]))
 def CmdExec(client: pyrogram.Client,
             msg: pyrogram.Message):
-    print(print_string.format(datetime.datetime.now().time(),
-                              msg.chat.first_name,
-                              msg.chat.username,
-                              msg.chat.id,
-                              msg.text))
+    print("\n[ UTC " + datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + "] " +
+          msg.chat.title if msg.chat.title else (msg.chat.first_name + ((" " + msg.chat.last_name) if msg.chat.last_name else "")) +
+          " (" + (("@" + msg.chat.username) if msg.chat.username else "") +
+          " #user{0}".format(msg.chat.id) + "): " +
+          msg.text)
     expression = " ".join(msg.command[1:])
 
     if expression:
@@ -51,41 +47,69 @@ def CmdExec(client: pyrogram.Client,
             file_name = "message_too_long_{0}.txt".format(str(time.time()))
             with open(file_name, "w") as f:
                 f.write(text)
-            client.send_document(chat_id=msg.chat.id,
-                                 document=file_name,
-                                 reply_to_message_id=msg.message_id)
+            msg.reply_document(document=file_name)
             os.remove(file_name)
         else:
             msg.reply(text=text)
 
 
-@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="mehelp", prefix=["/", "!", "#", "."]))
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("meeval", prefix=["/", "!", "#", "."]))
+def CmdEval(client: pyrogram.Client,
+            msg: pyrogram.Message):
+    print("\n[ UTC " + datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + "] " +
+          msg.chat.title if msg.chat.title else (msg.chat.first_name + ((" " + msg.chat.last_name) if msg.chat.last_name else "")) +
+          " (" + (("@" + msg.chat.username) if msg.chat.username else "") +
+          " #user{0}".format(msg.chat.id) + "): " +
+          msg.text)
+    expression = " ".join(msg.command[1:])
+
+    if expression:
+        text = "Done."
+        try:
+            result = eval(expression,
+                          {"client": client, "msg": msg})
+        except Exception as error:
+            text = str(error)
+        if result:
+            text = result
+
+        if len(str(text)) > 4096:
+            file_name = "message_too_long_{0}.txt".format(str(time.time()))
+            with open(file_name, "w") as f:
+                f.write(text)
+            msg.reply_document(document=file_name)
+            os.remove(file_name)
+        else:
+            msg.reply(text=text)
+
+
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("mehelp", prefix=["/", "!", "#", "."]))
 def CmdHelp(client: pyrogram.Client,
             msg: pyrogram.Message):
-    print(print_string.format(datetime.datetime.now().time(),
-                              msg.chat.first_name,
-                              msg.chat.username,
-                              msg.chat.id,
-                              msg.text))
-    msg.reply(text="""HELP
+    print("\n[ UTC " + datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + "] " +
+          msg.chat.title if msg.chat.title else (msg.chat.first_name + ((" " + msg.chat.last_name) if msg.chat.last_name else "")) +
+          " (" + (("@" + msg.chat.username) if msg.chat.username else "") +
+          " #user{0}".format(msg.chat.id) + "): " +
+          msg.text)
+    msg.edit_text(text="""HELP
 <code>!mehelp</code>: Sends this message.
 <code>!metodo {text}</code>: Sends {text} to yourself.
 <code>!mevardump [{reply}]</code>: Sends vardump of reply or actual message.
 <code>!merawinfo [{id}|{username}|{reply}]</code>: Sends chosen object if possible.
 <code>!meinfo [{id}|{username}|{reply}]</code>: Sends chosen object formatted properly if possible.
+<code>!meeval {one_line_of_code}</code>: Returns the result of {one_line_of_code}.
 <code>!meexec {code}</code>: Executes {code}.""",
-              parse_mode=pyrogram.ParseMode.HTML)
-    msg.delete()
+                  parse_mode="html")
 
 
-@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="metodo", prefix=["/", "!", "#", "."]))
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("metodo", prefix=["/", "!", "#", "."]))
 def CmdTodo(client: pyrogram.Client,
             msg: pyrogram.Message):
-    print(print_string.format(datetime.datetime.now().time(),
-                              msg.chat.first_name,
-                              msg.chat.username,
-                              msg.chat.id,
-                              msg.text))
+    print("\n[ UTC " + datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + "] " +
+          msg.chat.title if msg.chat.title else (msg.chat.first_name + ((" " + msg.chat.last_name) if msg.chat.last_name else "")) +
+          " (" + (("@" + msg.chat.username) if msg.chat.username else "") +
+          " #user{0}".format(msg.chat.id) + "): " +
+          msg.text)
     # remove the actual command
     msg.command.remove(msg.command[0])
 
@@ -96,47 +120,44 @@ def CmdTodo(client: pyrogram.Client,
     client.send_message(chat_id="me",
                         text="#TODO " + message)
     if msg.reply_to_message:
-        client.forward_messages(chat_id="me",
-                                from_chat_id=msg.chat.id,
-                                message_ids=msg.reply_to_message.message_id)
+        msg.reply_to_message.forward(chat_id="me")
     msg.delete()
 
 
-@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="mevardump", prefix=["/", "!", "#", "."]))
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("mevardump", prefix=["/", "!", "#", "."]))
 def CmdVardump(client: pyrogram.Client,
                msg: pyrogram.Message):
-    print(print_string.format(datetime.datetime.now().time(),
-                              msg.chat.first_name,
-                              msg.chat.username,
-                              msg.chat.id,
-                              msg.text))
+    print("\n[ UTC " + datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + "] " +
+          msg.chat.title if msg.chat.title else (msg.chat.first_name + ((" " + msg.chat.last_name) if msg.chat.last_name else "")) +
+          " (" + (("@" + msg.chat.username) if msg.chat.username else "") +
+          " #user{0}".format(msg.chat.id) + "): " +
+          msg.text)
+    txt = ""
     try:
         if msg.reply_to_message:
-            msg = msg.reply_to_message
-        msg = utils.CensorPhone(msg)
+            txt = msg.reply_to_message
+        txt = utils.CensorPhone(msg)
     except Exception as e:
-        msg = e
-    if len(str(msg)) > 4096:
+        txt = e
+    if len(str(txt)) > 4096:
         file_name = "message_too_long_{0}.txt".format(str(time.time()))
         with open(file_name, "w") as f:
-            f.write(str(msg))
-        client.send_document(chat_id=msg.chat.id,
-                             document=file_name,
-                             reply_to_message_id=msg.message_id)
+            f.write(str(txt))
+        msg.reply_document(document=file_name)
+        msg.delete()
         os.remove(file_name)
     else:
-        msg.reply(text="VARDUMP\n" + str(msg))
-    msg.delete()
+        msg.edit_text(text="VARDUMP\n" + str(txt))
 
 
-@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="merawinfo", prefix=["/", "!", "#", "."]))
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("merawinfo", prefix=["/", "!", "#", "."]))
 def CmdRawInfo(client: pyrogram.Client,
                msg: pyrogram.Message):
-    print(print_string.format(datetime.datetime.now().time(),
-                              msg.chat.first_name,
-                              msg.chat.username,
-                              msg.chat.id,
-                              msg.text))
+    print("\n[ UTC " + datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + "] " +
+          msg.chat.title if msg.chat.title else (msg.chat.first_name + ((" " + msg.chat.last_name) if msg.chat.last_name else "")) +
+          " (" + (("@" + msg.chat.username) if msg.chat.username else "") +
+          " #user{0}".format(msg.chat.id) + "): " +
+          msg.text)
     obj: pyrogram.User = None
     try:
         if len(msg.command) > 1:
@@ -149,18 +170,16 @@ def CmdRawInfo(client: pyrogram.Client,
         obj = utils.CensorPhone(obj)
     except Exception as e:
         obj = e
-    msg.reply(text="INFO\n" + str(obj))
-    msg.delete()
+    msg.edit_text(text="INFO\n" + str(obj))
 
 
-@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command(command="meinfo", prefix=["/", "!", "#", "."]))
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("meinfo", prefix=["/", "!", "#", "."]))
 def CmdInfo(client: pyrogram.Client,
             msg: pyrogram.Message):
-    print(print_string.format(datetime.datetime.now().time(),
-                              msg.chat.first_name,
-                              msg.chat.username,
-                              msg.chat.id,
-                              msg.text))
+    print("\n[ UTC " + datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + "] " +
+          msg.chat.title if msg.chat.title else (msg.chat.first_name + ((" " + msg.chat.last_name) if msg.chat.last_name else "")) +
+          " (" + (("@" + msg.chat.username) if msg.chat.username else "") +
+          " #user{0}".format(msg.chat.id) + "): " + msg.text)
     # TODO ADD GROUPDATA FOR USERS
     obj: pyrogram.User = None
     text = info_string
@@ -181,11 +200,19 @@ def CmdInfo(client: pyrogram.Client,
                            datetime.datetime.now().time())
     except Exception as e:
         text = "INFO\n" + str(e)
-    msg.reply(text=text)
-    msg.delete()
+    msg.edit_text(text=text)
+
+
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("mereboot", prefix=["/", "!", "#", "."]))
+def CmdReboot(client: pyrogram.Client,
+              msg: pyrogram.Message):
+    python = sys.executable
+    os.execl(python, python, *sys.argv)
 
 
 app.start()
 user = app.get_me()
 print(user)
+app.send_message(chat_id=user.id,
+                 text="Bot started!\nUTC {0}".format(datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")))
 app.idle()
