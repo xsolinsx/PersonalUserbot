@@ -33,15 +33,12 @@ def CmdExec(client: pyrogram.Client,
     expression = " ".join(msg.command[1:])
 
     if expression:
-        text = "Done."
+        text = None
         try:
-            result = exec(expression,
-                          {"client": client, "msg": msg})
+            text = str(exec(expression,
+                            {"client": client, "msg": msg}))
         except Exception as error:
             text = str(error)
-        else:
-            if result:
-                text = result
 
         if len(text) > 4096:
             file_name = "message_too_long_{0}.txt".format(str(time.time()))
@@ -64,16 +61,14 @@ def CmdEval(client: pyrogram.Client,
     expression = " ".join(msg.command[1:])
 
     if expression:
-        text = "Done."
+        text = None
         try:
-            result = eval(expression,
-                          {"client": client, "msg": msg})
+            text = str(eval(expression,
+                            {"client": client, "msg": msg}))
         except Exception as error:
             text = str(error)
-        if result:
-            text = result
 
-        if len(str(text)) > 4096:
+        if len(text) > 4096:
             file_name = "message_too_long_{0}.txt".format(str(time.time()))
             with open(file_name, "w") as f:
                 f.write(text)
