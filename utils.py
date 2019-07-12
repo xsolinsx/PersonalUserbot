@@ -11,9 +11,10 @@ def CensorPhone(obj: object) -> object:
         if hasattr(obj.from_user, "phone_number"):
             obj.from_user.phone_number = "CENSORED"
     if hasattr(obj, "reply_to_message"):
-        if hasattr(obj, "from_user"):
-            if hasattr(obj.reply_to_message.from_user, "phone_number"):
-                obj.reply_to_message.from_user.phone_number = "CENSORED"
+        if obj.reply_to_message:
+            if hasattr(obj.reply_to_message, "from_user"):
+                if hasattr(obj.reply_to_message.from_user, "phone_number"):
+                    obj.reply_to_message.from_user.phone_number = "CENSORED"
     return obj
 
 
