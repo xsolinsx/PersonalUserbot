@@ -88,6 +88,7 @@ def CmdHelp(client: pyrogram.Client,
           msg.text)
     msg.edit_text(text="""HELP
 <code>!mehelp</code>: Sends this message.
+<code>!meping</code>: Ping the userbot.
 <code>!metodo {text}</code>: Sends {text} to yourself.
 <code>!mevardump [{reply}]</code>: Sends vardump of reply or actual message.
 <code>!merawinfo [{id}|{username}|{reply}]</code>: Sends chosen object if possible.
@@ -131,6 +132,8 @@ def CmdVardump(client: pyrogram.Client,
     try:
         if msg.reply_to_message:
             txt = msg.reply_to_message
+        else:
+            txt = msg
         txt = utils.CensorPhone(msg)
     except Exception as e:
         txt = e
@@ -196,6 +199,16 @@ def CmdInfo(client: pyrogram.Client,
     except Exception as e:
         text = "INFO\n" + str(e)
     msg.edit_text(text=text)
+
+
+@app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("meping", prefix=["/", "!", "#", "."]))
+def CmdPing(client: pyrogram.Client,
+            msg: pyrogram.Message):
+    print("\n[ UTC " + datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S") + "] " +
+          msg.chat.title if msg.chat.title else (msg.chat.first_name + ((" " + msg.chat.last_name) if msg.chat.last_name else "")) +
+          " (" + (("@" + msg.chat.username) if msg.chat.username else "") +
+          " #user{0}".format(msg.chat.id) + "): " + msg.text)
+    msg.edit_text(text="Pong!")
 
 
 @app.on_message(pyrogram.Filters.user("me") & pyrogram.Filters.command("mereboot", prefix=["/", "!", "#", "."]))
