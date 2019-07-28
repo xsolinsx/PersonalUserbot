@@ -13,7 +13,7 @@ import pyrogram
 import utils
 
 logging.basicConfig(format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
-                    level=logging.INFO)
+                    level=logging.ERROR)
 
 info_string = "INFO\nID: {0}\nType: {1}\nUsername: {2}\nName: {3}\nSurname: {4}\nDescription: {5}\nDate: {6}"
 
