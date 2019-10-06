@@ -34,15 +34,15 @@ def SizeFormatter(b: int) -> str:
     TB = float(pow(KB, 4))
 
     if B < KB:
-        return "{0} B".format(B)
+        return f"{B} B"
     elif KB <= B < MB:
-        return "{0:.2f} KB".format(B/KB)
+        return f"{B/KB:.2f} KB"
     elif MB <= B < GB:
-        return "{0:.2f} MB".format(B/MB)
+        return f"{B/MB:.2f} MB"
     elif GB <= B < TB:
-        return "{0:.2f} GB".format(B/GB)
+        return f"{B/GB:.2f} GB"
     elif TB <= B:
-        return "{0:.2f} TB".format(B/TB)
+        return f"{B/TB:.2f} TB"
 
 
 def TimeFormatter(milliseconds: int) -> str:
@@ -58,11 +58,11 @@ def TimeFormatter(milliseconds: int) -> str:
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
-    tmp = ((str(days) + "d, ") if days > 0 else "") + \
-        ((str(hours) + "h, ") if hours > 0 else "") + \
-        ((str(minutes) + "m, ") if minutes > 0 else "") + \
-        ((str(seconds) + "s, ") if seconds > 0 else "") + \
-        ((str(milliseconds) + "ms, ") if milliseconds > 0 else "")
+    tmp = (f"{days}d, " if days > 0 else "") + \
+        (f"{hours}h, " if hours > 0 else "") + \
+        (f"{minutes}m, " if minutes > 0 else "") + \
+        (f"{seconds}s, " if seconds > 0 else "") + \
+        (f"{milliseconds}ms, " if milliseconds > 0 else "")
     return tmp[:-2]
 
 
@@ -80,13 +80,12 @@ def IsInt(v) -> bool:
     try:
         int(v)
         return True
-    except Exception as e:
-        print(e)
+    except Exception as ex:
+        print(ex)
         return False
 
 
-def DFromUToTelegramProgress(client: pyrogram.Client,
-                             current: int,
+def DFromUToTelegramProgress(current: int,
                              total: int,
                              msg: pyrogram.Message,
                              chat_id: int or str,
@@ -95,8 +94,6 @@ def DFromUToTelegramProgress(client: pyrogram.Client,
     """
     Use this method to update the progress of a download from/an upload to Telegram, this method is called every 512KB.
     Update message every ~4 seconds.
-
-    client (:class:`Client <pyrogram.Client>`): The Client itself.
 
     current (``int``): Currently downloaded/uploaded bytes.
 
