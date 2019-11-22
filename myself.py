@@ -1,10 +1,6 @@
 import datetime
-import json
 import logging
-import math
 import os
-import pprint
-import re
 import sys
 import time
 
@@ -324,7 +320,9 @@ def CmdPing(client: pyrogram.Client, msg: pyrogram.Message):
         + f"#chat{msg.chat.id}): "
         + msg.text
     )
-    msg.edit_text(text=msg.text.replace("i", "o"))
+    msg.edit_text(
+        text=f"pong!\n{utils.TimeFormatter((datetime.datetime.now() - datetime.datetime.fromtimestamp(msg.date)).total_seconds() * 1000)}"
+    )
 
 
 @app.on_message(
