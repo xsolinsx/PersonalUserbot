@@ -58,11 +58,13 @@ def TimeFormatter(milliseconds: int) -> str:
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
-    tmp = (f"{days}d, " if days > 0 else "") + \
-        (f"{hours}h, " if hours > 0 else "") + \
-        (f"{minutes}m, " if minutes > 0 else "") + \
-        (f"{seconds}s, " if seconds > 0 else "") + \
-        (f"{milliseconds}ms, " if milliseconds > 0 else "")
+    tmp = (
+        (f"{days}d, " if days > 0 else "")
+        + (f"{hours}h, " if hours > 0 else "")
+        + (f"{minutes}m, " if minutes > 0 else "")
+        + (f"{seconds}s, " if seconds > 0 else "")
+        + (f"{milliseconds}ms, " if milliseconds > 0 else "")
+    )
     return tmp[:-2]
 
 
@@ -85,12 +87,14 @@ def IsInt(v) -> bool:
         return False
 
 
-def DFromUToTelegramProgress(current: int,
-                             total: int,
-                             msg: pyrogram.Message,
-                             chat_id: int or str,
-                             text: str,
-                             start: float) -> None:
+def DFromUToTelegramProgress(
+    current: int,
+    total: int,
+    msg: pyrogram.Message,
+    chat_id: int or str,
+    text: str,
+    start: float,
+) -> None:
     """
     Use this method to update the progress of a download from/an upload to Telegram, this method is called every 512KB.
     Update message every ~4 seconds.
@@ -124,16 +128,17 @@ def DFromUToTelegramProgress(current: int,
         estimated_total_time = TimeFormatter(milliseconds=estimated_total_time)
         # 0% = [░░░░░░░░░░░░░░░░░░░░]
         # 100% = [████████████████████]
-        progress = "[{0}{1}] {2}%\n".format(''.join(["█" for i in range(math.floor(percentage / 5))]),
-                                            ''.join(
-                                                ["░" for i in range(20 - math.floor(percentage / 5))]),
-                                            round(percentage, 2))
-        tmp = progress + "{0}/{1}\n{2}/s {3}/{4}\n".format(SizeFormatter(b=current * 8),
-                                                           SizeFormatter(
-                                                               b=total * 8),
-                                                           SizeFormatter(
-                                                               b=speed * 8),
-                                                           elapsed_time if elapsed_time != '' else "0 s",
-                                                           estimated_total_time if estimated_total_time != '' else "0 s")
+        progress = "[{0}{1}] {2}%\n".format(
+            "".join(["█" for i in range(math.floor(percentage / 5))]),
+            "".join(["░" for i in range(20 - math.floor(percentage / 5))]),
+            round(percentage, 2),
+        )
+        tmp = progress + "{0}/{1}\n{2}/s {3}/{4}\n".format(
+            SizeFormatter(b=current * 8),
+            SizeFormatter(b=total * 8),
+            SizeFormatter(b=speed * 8),
+            elapsed_time if elapsed_time != "" else "0 s",
+            estimated_total_time if estimated_total_time != "" else "0 s",
+        )
 
         msg.edit(text=text + tmp)
