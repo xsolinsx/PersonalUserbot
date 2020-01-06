@@ -1,7 +1,78 @@
+import glob
 import math
+import os
+import shutil
 import time
+import typing
 
 import pyrogram
+
+
+def PrintUser(user: typing.Union[pyrogram.Chat, pyrogram.User]) -> str:
+    return (
+        (user.first_name + (f" {user.last_name}" if user.last_name else ""))
+        + " ("
+        + (f"@{user.username} " if user.username else "")
+        + f"#user{user.id})"
+    )
+
+
+def IsInt(v) -> bool:
+    """
+    Check if the parameter can be int.
+
+    v: Variable to check.
+
+
+    SUCCESS Returns ``True``.
+
+    FAILURE Returns ``False``.
+    """
+    try:
+        int(v)
+        return True
+    except Exception as ex:
+        print(ex)
+        return False
+
+
+def Backup() -> str:
+    # empty downloads folder
+    for filename in os.listdir("./downloads"):
+        file_path = os.path.join("./downloads", filename)
+        try:
+            if os.path.isfile(file_path) or os.path.islink(file_path):
+                os.unlink(file_path)
+            elif os.path.isdir(file_path):
+                shutil.rmtree(file_path)
+        except Exception as ex:
+            print(f"Failed to delete {file_path}. Reason: {ex}")
+    # remove previous backups
+    for filename in glob.glob("../backupUserbot*"):
+        os.remove(filename)
+
+    zip_name = shutil.make_archive(
+        base_name=f"../backupUserbot{int(time.time())}", format="zip",
+    )
+    return zip_name
+
+
+def SendBackup(client: pyrogram.Client):
+    tmp_msg = client.send_message(
+        chat_id=client.ME.id,
+        text="I am preparing the automatic backup.",
+        disable_notification=True,
+    )
+
+    zip_name = Backup()
+
+    client.send_document(
+        chat_id=client.ME.id,
+        document=zip_name,
+        disable_notification=True,
+        progress=DFromUToTelegramProgress,
+        progress_args=(tmp_msg, "I am sending the automatic backup.", time.time(),),
+    )
 
 
 def CensorPhone(obj: object) -> object:
@@ -66,25 +137,6 @@ def TimeFormatter(milliseconds: int) -> str:
         + (f"{milliseconds}ms, " if milliseconds > 0 else "")
     )
     return tmp[:-2]
-
-
-def IsInt(v) -> bool:
-    """
-    Check if the parameter can be int.
-
-    v: Variable to check.
-
-
-    SUCCESS Returns ``True``.
-
-    FAILURE Returns ``False``.
-    """
-    try:
-        int(v)
-        return True
-    except Exception as ex:
-        print(ex)
-        return False
 
 
 def DFromUToTelegramProgress(

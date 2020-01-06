@@ -1,1 +1,2 @@
+apscheduler
 pyrogram[fast]==0.16.0
