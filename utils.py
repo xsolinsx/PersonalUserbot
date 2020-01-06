@@ -71,7 +71,7 @@ def SendBackup(client: pyrogram.Client):
         document=zip_name,
         disable_notification=True,
         progress=DFromUToTelegramProgress,
-        progress_args=(tmp_msg, "I am sending the automatic backup.", time.time(),),
+        progress_args=(tmp_msg, "I am sending the automatic backup.", time.time()),
     )
 
 
@@ -140,12 +140,7 @@ def TimeFormatter(milliseconds: int) -> str:
 
 
 def DFromUToTelegramProgress(
-    current: int,
-    total: int,
-    msg: pyrogram.Message,
-    chat_id: int or str,
-    text: str,
-    start: float,
+    current: int, total: int, msg: pyrogram.Message, text: str, start: float,
 ) -> None:
     """
     Use this method to update the progress of a download from/an upload to Telegram, this method is called every 512KB.
@@ -156,8 +151,6 @@ def DFromUToTelegramProgress(
     total (``int``): File size in bytes.
 
     msg (:class:`Message <pyrogram.Message>`): The Message to update while downloading/uploading the file.
-
-    chat_id (``int`` | ``str``): Unique identifier (int) or username (str) of the target chat. For your personal cloud (Saved Messages) you can simply use "me" or "self". For a contact that exists in your Telegram address book you can use his phone number (str). For a private channel/supergroup you can use its *t.me/joinchat/* link.
 
     text (``str``): Text to put into the update.
 
