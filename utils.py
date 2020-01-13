@@ -2,6 +2,7 @@ import glob
 import math
 import os
 import shutil
+import tarfile
 import time
 import typing
 
@@ -51,10 +52,15 @@ def Backup() -> str:
     for filename in glob.glob("../backupUserbot*"):
         os.remove(filename)
 
-    zip_name = shutil.make_archive(
-        base_name=f"../backupUserbot{int(time.time())}", format="zip",
-    )
-    return zip_name
+    backup_name = f"backupUserbot{int(time.time())}.tar.xz"
+    with tarfile.TarFile(backup_name, "w:xz") as f_tar_xz:
+        for folderName, subfolders, filenames in os.walk("./"):
+            for filename in filenames:
+                filePath = os.path.join(folderName, filename)
+                if not filePath.endswith(".tar.xz"):
+                    # exclude other backups
+                    f_tar_xz.write(filePath)
+    return backup_name
 
 
 def SendBackup(client: pyrogram.Client):
@@ -64,11 +70,11 @@ def SendBackup(client: pyrogram.Client):
         disable_notification=True,
     )
 
-    zip_name = Backup()
+    backup_name = Backup()
 
     client.send_document(
         chat_id=client.ME.id,
-        document=zip_name,
+        document=backup_name,
         disable_notification=True,
         progress=DFromUToTelegramProgress,
         progress_args=(tmp_msg, "I am sending the automatic backup.", time.time()),
