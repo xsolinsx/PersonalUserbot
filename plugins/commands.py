@@ -297,7 +297,7 @@ def CmdRawInfo(client: pyrogram.Client, msg: pyrogram.Message):
             obj = str(client.get_chat(chat_id=msg.chat.id))
     except Exception as ex:
         obj = ex
-    msg.edit_text(text="INFO\n" + str(obj))
+    msg.edit_text(text=f"INFO\n{obj}")
 
 
 @pyrogram.Client.on_message(

@@ -53,13 +53,17 @@ def Backup() -> str:
         os.remove(filename)
 
     backup_name = f"backupUserbot{int(time.time())}.tar.xz"
-    with tarfile.TarFile(backup_name, "w:xz") as f_tar_xz:
+    with tarfile.open(backup_name, mode="w:xz") as f_tar_xz:
         for folderName, subfolders, filenames in os.walk("./"):
-            for filename in filenames:
-                filePath = os.path.join(folderName, filename)
-                if not filePath.endswith(".tar.xz"):
-                    # exclude other backups
-                    f_tar_xz.write(filePath)
+            if not folderName.startswith("./.git"):
+                for filename in filenames:
+                    if filename != backup_name and not (
+                        filename.endswith(".session")
+                        or filename.endswith(".session-journal")
+                    ):
+                        # exclude current backup and session files
+                        filePath = os.path.join(folderName, filename)
+                        f_tar_xz.add(filePath)
     return backup_name
 
 
@@ -192,4 +196,4 @@ def DFromUToTelegramProgress(
             estimated_total_time if estimated_total_time != "" else "0 s",
         )
 
-        msg.edit(text=text + tmp)
+        msg.edit_text(text=text + tmp)
