@@ -87,7 +87,7 @@ def CmdExec(client: pyrogram.Client, msg: pyrogram.Message):
     if expression:
         text = None
         try:
-            text = exec(expression, {"client": client, "msg": msg})
+            text = exec(expression, dict(client=client, msg=msg))
         except Exception as ex:
             text = str(ex)
 
@@ -130,7 +130,7 @@ def CmdEval(client: pyrogram.Client, msg: pyrogram.Message):
     if expression:
         text = None
         try:
-            text = str(eval(expression, {"client": client, "msg": msg}))
+            text = str(eval(expression, dict(client=client, msg=msg)))
         except Exception as ex:
             text = str(ex)
 
