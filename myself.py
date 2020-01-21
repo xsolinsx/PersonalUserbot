@@ -17,9 +17,19 @@ logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.ERROR
 )
 
+if not utils.config:
+    logging.log(logging.FATAL, "Missing config.json")
+    exit()
+
 plugins = dict(root="plugins")
 # check telegram api key
-APP = pyrogram.Client(session_name="Pyrogram", workers=4, plugins=plugins)
+APP = pyrogram.Client(
+    session_name="Pyrogram",
+    api_id=utils.config["telegram"]["api_id"],
+    api_hash=utils.config["telegram"]["api_hash"],
+    workers=4,
+    plugins=plugins,
+)
 
 
 APP.start()

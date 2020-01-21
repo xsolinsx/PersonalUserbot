@@ -1,4 +1,5 @@
 import glob
+import json
 import math
 import os
 import shutil
@@ -7,6 +8,10 @@ import time
 import typing
 
 import pyrogram
+
+config = None
+with open(file="config.json", encoding="utf-8") as f:
+    config = json.load(fp=f)
 
 
 def PrintUser(user: typing.Union[pyrogram.Chat, pyrogram.User]) -> str:
@@ -49,21 +54,35 @@ def Backup() -> str:
         except Exception as ex:
             print(f"Failed to delete {file_path}. Reason: {ex}")
     # remove previous backups
-    for filename in glob.glob("../backupUserbot*"):
+    for filename in glob.glob("./backupUserbot*"):
         os.remove(filename)
 
     backup_name = f"backupUserbot{int(time.time())}.tar.xz"
     with tarfile.open(backup_name, mode="w:xz") as f_tar_xz:
-        for folderName, subfolders, filenames in os.walk("./"):
-            if not (folderName.startswith("./.git") or "__pycache__" in folderName):
+        # backup userbot
+        for folder_name, subfolders, filenames in os.walk("./"):
+            if not (folder_name.startswith("./.git") or "__pycache__" in folder_name):
                 for filename in filenames:
                     if filename != backup_name and not (
                         filename.endswith(".session")
                         or filename.endswith(".session-journal")
                     ):
                         # exclude current backup and session files
-                        filePath = os.path.join(folderName, filename)
-                        f_tar_xz.add(filePath)
+                        file_path = os.path.join(folder_name, filename)
+                        print(file_path)
+                        f_tar_xz.add(file_path)
+        # backup additional files and folders
+        for file_dir in config["additional_backup"]:
+            if os.path.isfile(file_dir):
+                # if file backup file
+                f_tar_xz.add(file_dir)
+            elif os.path.isdir(file_dir):
+                # if folder backup whole folder
+                for folder_name, subfolders, filenames in os.walk(file_dir):
+                    for filename in filenames:
+                        file_path = os.path.join(folder_name, filename)
+                        print(file_path)
+                        f_tar_xz.add(file_path)
     return backup_name
 
 

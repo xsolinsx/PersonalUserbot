@@ -21,7 +21,7 @@ venv.bak/
 *.db
 *.db-shm
 *.db-wal
-config.ini
+config.json
 unknown_errors.txt
 backup*.tar.xz
 
