@@ -57,7 +57,7 @@ def CmdBackup(client: pyrogram.Client, msg: pyrogram.Message):
         + f"#chat{msg.chat.id}): "
         + msg.text
     )
-    utils.SendBackup(client=client)
+    utils.SendBackup(client=client, msg=msg)
 
 
 @pyrogram.Client.on_message(
@@ -170,6 +170,9 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
     msg.edit_text(
         text="""HELP
 <code>!mehelp</code>: Sends this message.
+<code>!megetip</code>: Get IP of the server.
+<code>!mebackup</code>: Execute the backup of the userbot and of the files and folders specified in the config.
+<code>!mereboot</code>: Reboot the userbot.
 <code>!meping</code>: Ping the userbot.
 <code>!metodo {text}</code>: Sends {text} to yourself.
 <code>!mevardump [{reply}]</code>: Sends vardump of reply or actual message.

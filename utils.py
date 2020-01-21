@@ -75,6 +75,7 @@ def Backup() -> str:
         for file_dir in config["additional_backup"]:
             if os.path.isfile(file_dir):
                 # if file backup file
+                print(file_dir)
                 f_tar_xz.add(file_dir)
             elif os.path.isdir(file_dir):
                 # if folder backup whole folder
@@ -83,15 +84,19 @@ def Backup() -> str:
                         file_path = os.path.join(folder_name, filename)
                         print(file_path)
                         f_tar_xz.add(file_path)
+
     return backup_name
 
 
-def SendBackup(client: pyrogram.Client):
-    tmp_msg = client.send_message(
-        chat_id=client.ME.id,
-        text="I am preparing the automatic backup.",
-        disable_notification=True,
-    )
+def SendBackup(client: pyrogram.Client, msg: pyrogram.Message = None):
+    if msg:
+        msg.edit_text(text="I am preparing the automatic backup.")
+    else:
+        msg = client.send_message(
+            chat_id=client.ME.id,
+            text="I am preparing the automatic backup.",
+            disable_notification=True,
+        )
 
     backup_name = Backup()
 
@@ -100,7 +105,7 @@ def SendBackup(client: pyrogram.Client):
         document=backup_name,
         disable_notification=True,
         progress=DFromUToTelegramProgress,
-        progress_args=(tmp_msg, "I am sending the automatic backup.", time.time()),
+        progress_args=(msg, "I am sending the automatic backup.", time.time()),
     )
 
 
