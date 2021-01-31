@@ -10,10 +10,13 @@ import utils
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("megetip", prefixes=["/", "!", "#", "."],)
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command(
+        "megetip",
+        prefixes=["/", "!", "#", "."],
+    )
 )
-def CmdGetIP(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdGetIP(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -36,10 +39,10 @@ def CmdGetIP(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("mebackup", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("mebackup", prefixes=["/", "!", "#", "."])
 )
-def CmdBackup(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdBackup(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -61,10 +64,10 @@ def CmdBackup(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("meexec", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("meexec", prefixes=["/", "!", "#", "."])
 )
-def CmdExec(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdExec(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -104,10 +107,10 @@ def CmdExec(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("meeval", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("meeval", prefixes=["/", "!", "#", "."])
 )
-def CmdEval(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdEval(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -146,10 +149,10 @@ def CmdEval(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("mehelp", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("mehelp", prefixes=["/", "!", "#", "."])
 )
-def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -175,6 +178,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
 <code>!mereboot</code>: Reboot the userbot.
 <code>!meping</code>: Ping the userbot.
 <code>!metodo {text}</code>: Sends {text} to yourself.
+<code>!meto {media_type} {reply}</code>: Sends media|text in reply as the specified {media_type} that can be <code>animation|audio|document|photo|sticker|video|video_note|voice</code>.
 <code>!mevardump [{reply}]</code>: Sends vardump of reply or actual message.
 <code>!merawinfo [{id}|{username}|{reply}]</code>: Sends chosen object if possible.
 <code>!meinfo [{id}|{username}|{reply}]</code>: Sends chosen object formatted properly if possible.
@@ -185,10 +189,63 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("metodo", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("meto", prefixes=["/", "!", "#", "."])
 )
-def CmdTodo(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdTo(client: pyrogram.Client, msg: pyrogram.types.Message):
+    print(
+        "\n[ UTC {0} ] ".format(
+            datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
+        )
+        + (
+            msg.chat.title
+            if msg.chat.title
+            else (
+                msg.chat.first_name
+                + (f" {msg.chat.last_name}" if msg.chat.last_name else "")
+            )
+        )
+        + " ("
+        + (f"@{msg.chat.username} " if msg.chat.username else " ")
+        + f"#chat{msg.chat.id}): "
+        + msg.text
+    )
+    if len(msg.command) > 1 and msg.reply_to_message:
+        try:
+            path = None
+            if msg.reply_to_message.media:
+                path = msg.reply_to_message.download()
+            else:
+                path = f"text_{msg.reply_to_message.message_id}_{time.time()}.txt"
+                with open(path, "w", encoding="utf-8") as f:
+                    f.write(str(msg.reply_to_message))
+            if msg.command[1] == "animation":
+                msg.reply_animation(animation=path)
+            elif msg.command[1] == "audio":
+                msg.reply_audio(audio=path)
+            elif msg.command[1] == "document":
+                msg.reply_document(document=path)
+            elif msg.command[1] == "photo":
+                msg.reply_photo(photo=path)
+            elif msg.command[1] == "sticker":
+                msg.reply_sticker(sticker=path)
+            elif msg.command[1] == "video":
+                msg.reply_video(video=path)
+            elif msg.command[1] == "video_note":
+                msg.reply_video_note(video_note=path)
+            elif msg.command[1] == "voice":
+                msg.reply_voice(voice=path)
+            os.remove(path=path)
+            msg.delete()
+        except Exception as ex:
+            msg.edit_text(text=ex)
+
+
+@pyrogram.Client.on_message(
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("metodo", prefixes=["/", "!", "#", "."])
+)
+def CmdTodo(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -211,7 +268,7 @@ def CmdTodo(client: pyrogram.Client, msg: pyrogram.Message):
 
     message = ""
     if len(msg.command) > 0:
-        # reconstruct the path in case there are spaces (pyrogram.Filters.command uses spaces as default separator)
+        # reconstruct the path in case there are spaces (pyrogram.filters.command uses spaces as default separator)
         message += " ".join(msg.command)
     client.send_message(chat_id="me", text="#TODO " + message)
     if msg.reply_to_message:
@@ -220,10 +277,10 @@ def CmdTodo(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("mevardump", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("mevardump", prefixes=["/", "!", "#", "."])
 )
-def CmdVardump(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdVardump(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -263,10 +320,10 @@ def CmdVardump(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("merawinfo", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("merawinfo", prefixes=["/", "!", "#", "."])
 )
-def CmdRawInfo(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdRawInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -284,7 +341,7 @@ def CmdRawInfo(client: pyrogram.Client, msg: pyrogram.Message):
         + f"#chat{msg.chat.id}): "
         + msg.text
     )
-    obj: pyrogram.User = None
+    obj: pyrogram.types.User = None
     try:
         if len(msg.command) > 1:
             obj = str(
@@ -304,10 +361,10 @@ def CmdRawInfo(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("meinfo", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("meinfo", prefixes=["/", "!", "#", "."])
 )
-def CmdInfo(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdInfo(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -326,7 +383,7 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.Message):
         + msg.text
     )
     # TODO ADD GROUPDATA FOR USERS
-    obj: pyrogram.User = None
+    obj: pyrogram.types.User = None
     try:
         if len(msg.command) > 1:
             obj = client.get_chat(
@@ -346,10 +403,10 @@ def CmdInfo(client: pyrogram.Client, msg: pyrogram.Message):
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("meping", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("meping", prefixes=["/", "!", "#", "."])
 )
-def CmdPing(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdPing(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")
@@ -372,15 +429,15 @@ def CmdPing(client: pyrogram.Client, msg: pyrogram.Message):
     msg.edit_text(text="pong!")
     end = datetime.datetime.utcnow()
     msg.edit_text(
-        text=f"pong!\\n{utils.TimeFormatter((end - start).microseconds / 1000)}"
+        text=f"pong!\n{utils.TimeFormatter((end - start).microseconds / 1000)}"
     )
 
 
 @pyrogram.Client.on_message(
-    pyrogram.Filters.user("me")
-    & pyrogram.Filters.command("mereboot", prefixes=["/", "!", "#", "."])
+    pyrogram.filters.user("me")
+    & pyrogram.filters.command("mereboot", prefixes=["/", "!", "#", "."])
 )
-def CmdReboot(client: pyrogram.Client, msg: pyrogram.Message):
+def CmdReboot(client: pyrogram.Client, msg: pyrogram.types.Message):
     print(
         "\n[ UTC {0} ] ".format(
             datetime.datetime.utcnow().strftime("%Y/%m/%d %H:%M:%S")

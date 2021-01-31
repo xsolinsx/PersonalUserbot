@@ -14,7 +14,7 @@ with open(file="config.json", encoding="utf-8") as f:
     config = json.load(fp=f)
 
 
-def PrintUser(user: typing.Union[pyrogram.Chat, pyrogram.User]) -> str:
+def PrintUser(user: typing.Union[pyrogram.types.Chat, pyrogram.types.User]) -> str:
     return (
         (user.first_name + (f" {user.last_name}" if user.last_name else ""))
         + " ("
@@ -88,7 +88,7 @@ def Backup() -> str:
     return backup_name
 
 
-def SendBackup(client: pyrogram.Client, msg: pyrogram.Message = None):
+def SendBackup(client: pyrogram.Client, msg: pyrogram.types.Message = None):
     if msg:
         msg.edit_text(text="I am preparing the automatic backup.")
     else:
@@ -174,7 +174,11 @@ def TimeFormatter(milliseconds: int) -> str:
 
 
 def DFromUToTelegramProgress(
-    current: int, total: int, msg: pyrogram.Message, text: str, start: float,
+    current: int,
+    total: int,
+    msg: pyrogram.types.Message,
+    text: str,
+    start: float,
 ) -> None:
     """
     Use this method to update the progress of a download from/an upload to Telegram, this method is called every 512KB.
@@ -184,7 +188,7 @@ def DFromUToTelegramProgress(
 
     total (``int``): File size in bytes.
 
-    msg (:class:`Message <pyrogram.Message>`): The Message to update while downloading/uploading the file.
+    msg (:class:`Message <pyrogram.types.Message>`): The Message to update while downloading/uploading the file.
 
     text (``str``): Text to put into the update.
 
