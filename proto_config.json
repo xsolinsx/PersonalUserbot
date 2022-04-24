@@ -1,4 +1,8 @@
 {
+    "telegram": {
+        "api_id": "id",
+        "api_hash": "hash"
+    },
     "additional_backup": [
         "/path/to/file_to.backup",
         "/path/to/folder_to_backup/"
