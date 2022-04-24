@@ -216,7 +216,7 @@ def CmdTo(client: pyrogram.Client, msg: pyrogram.types.Message):
             if msg.reply_to_message.media:
                 path = msg.reply_to_message.download()
             else:
-                path = f"text_{msg.reply_to_message.message_id}_{time.time()}.txt"
+                path = f"text_{msg.reply_to_message.id}_{time.time()}.txt"
                 with open(path, "w", encoding="utf-8") as f:
                     f.write(str(msg.reply_to_message))
             if msg.command[1] == "animation":
