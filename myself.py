@@ -30,7 +30,7 @@ APP = pyrogram.Client(
     api_hash=utils.config["telegram"]["api_hash"],
     workers=4,
     plugins=plugins,
-    parse_mode=None,
+    parse_mode=pyrogram.enums.parse_mode.ParseMode.DISABLED,
 )
 
 
@@ -61,7 +61,7 @@ APP.send_message(
         )
     )
     + f"\n\n<b>{len(loaded_plugins)} plugins loaded</b>",
-    parse_mode="html",
+    parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
 )
 # schedule backup at UTC 02:30 with a random delay between ± 10 minutes
 scheduler.add_job(

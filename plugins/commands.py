@@ -184,7 +184,7 @@ def CmdHelp(client: pyrogram.Client, msg: pyrogram.types.Message):
 <code>!meinfo [{id}|{username}|{reply}]</code>: Sends chosen object formatted properly if possible.
 <code>!meeval {one_line_of_code}</code>: Returns the result of {one_line_of_code}.
 <code>!meexec {code}</code>: Executes {code}.""",
-        parse_mode="html",
+        parse_mode=pyrogram.enums.parse_mode.ParseMode.HTML,
     )
 
 
