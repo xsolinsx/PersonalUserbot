@@ -25,9 +25,7 @@ if not utils.config:
 plugins = dict(root="plugins")
 # check telegram api key
 APP = pyrogram.Client(
-    session_name="Pyrogram Test",
-    api_id=utils.config["telegram"]["api_id"],
-    api_hash=utils.config["telegram"]["api_hash"],
+    name="Pyrogram Test",
     workers=4,
     plugins=plugins,
     parse_mode=pyrogram.enums.parse_mode.ParseMode.DISABLED,
