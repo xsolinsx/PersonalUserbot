@@ -25,7 +25,7 @@ if not utils.config:
 plugins = dict(root="plugins")
 # check telegram api key
 APP = pyrogram.Client(
-    session_name="Pyrogram Test",
+    name="Pyrogram Test",
     api_id=utils.config["telegram"]["api_id"],
     api_hash=utils.config["telegram"]["api_hash"],
     workers=4,
@@ -42,7 +42,7 @@ print(
     )
 )
 plugins = dict(root="plugins")
-loaded_plugins = []
+loaded_plugins = list()
 for dirpath, dirnames, filenames in os.walk(APP.plugins["root"]):
     # filter out __pycache__ folders
     if "__pycache__" not in dirpath:
